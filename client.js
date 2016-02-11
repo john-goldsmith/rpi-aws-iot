@@ -10,7 +10,6 @@ app.use(bodyParser.urlencoded({
 app.set('port', (process.env.PORT || 5000));
 
 app.post('/', function (req, res) {
-  console.log(req.body);
   res.status(200);
   if (req.body.token === process.env.SLACK_TOKEN) {
     res.json({
