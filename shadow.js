@@ -57,6 +57,8 @@ app.post('/', function (req, res) {
         response_type: 'in_channel',
         text: 'Error: operation currently in progress'
       });
+    } else {
+      console.log('valid client token', clientToken);
     }
 
   } else {
