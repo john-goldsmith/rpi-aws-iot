@@ -12,6 +12,7 @@ var thingShadow = awsIot.thingShadow({
 });
 
 thingShadow.on('connect', function () {
+  console.log('connect');
   thingShadow.register(process.env.AWS_IOT_CLIENT_ID);
 });
 
@@ -25,9 +26,11 @@ app.set('port', (process.env.PORT || 5000));
 app.post('/', function (req, res) {
   res.status(200);
   if (req.body.token === process.env.SLACK_TOKEN) {
-
+    console.log('valid Slack token');
     thingShadow.on('status', function (thingName, status, clientToken, stateObject) {
+      console.log('status')
       if (status === 'accepted') {
+        console.log('request accepted');
         res.json({
           response_type: 'in_channel',
           attachments: [
@@ -39,6 +42,7 @@ app.post('/', function (req, res) {
           ]
         });
       } else {
+        console.log('request rejected');
         res.json({
           response_type: 'in_channel',
           text: 'Error: request rejected'
@@ -48,6 +52,7 @@ app.post('/', function (req, res) {
 
     var clientToken = thingShadow.get(process.env.AWS_IOT_CLIENT_ID);
     if (!clientToken) {
+      console.log('invalid client token');
       res.json({
         response_type: 'in_channel',
         text: 'Error: operation currently in progress'
@@ -55,6 +60,7 @@ app.post('/', function (req, res) {
     }
 
   } else {
+    console.log('invalid Slack token');
     res.json({
       response_type: 'in_channel',
       text: 'Error: token mismatch'
