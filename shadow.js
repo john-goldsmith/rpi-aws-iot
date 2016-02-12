@@ -16,6 +16,43 @@ thingShadow.on('connect', function () {
   thingShadow.register(process.env.AWS_IOT_CLIENT_ID);
 });
 
+thingShadow.on('message', function (topic, message) {
+  console.log('message', topic, message);
+});
+
+thingShadow.on('delta', function (thingName, state) {
+  console.log('delta', thingName, state);
+});
+
+thingShadow.on('timeout', function (thingName, clientToken) {
+  console.log('timeout', thingName, clientToken);
+});
+
+function listenForStatus (res) {
+  thingShadow.on('status', function (thingName, status, clientToken, stateObject) {
+    console.log('status');
+    if (status === 'accepted') {
+      console.log('request accepted');
+      res.json({
+        response_type: 'in_channel',
+        attachments: [
+          {
+            title: 'Lounge status',
+            title_link: 'https://s3-us-west-2.amazonaws.com/rpi-aws-iot/camera.jpg',
+            image_url: 'https://s3-us-west-2.amazonaws.com/rpi-aws-iot/camera.jpg'
+          }
+        ]
+      });
+    } else {
+      console.log('request rejected');
+      res.json({
+        response_type: 'in_channel',
+        text: 'Error: request rejected'
+      });
+    }
+  });
+}
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
@@ -27,28 +64,8 @@ app.post('/', function (req, res) {
   res.status(200);
   if (req.body.token === process.env.SLACK_TOKEN) {
     console.log('valid Slack token');
-    thingShadow.on('status', function (thingName, status, clientToken, stateObject) {
-      console.log('status')
-      if (status === 'accepted') {
-        console.log('request accepted');
-        res.json({
-          response_type: 'in_channel',
-          attachments: [
-            {
-              title: 'Lounge status',
-              title_link: 'https://s3-us-west-2.amazonaws.com/rpi-aws-iot/camera.jpg',
-              image_url: 'https://s3-us-west-2.amazonaws.com/rpi-aws-iot/camera.jpg'
-            }
-          ]
-        });
-      } else {
-        console.log('request rejected');
-        res.json({
-          response_type: 'in_channel',
-          text: 'Error: request rejected'
-        });
-      }
-    });
+
+    listenForStatus(res);
 
     var clientToken = thingShadow.get(process.env.AWS_IOT_CLIENT_ID);
     if (!clientToken) {
@@ -58,7 +75,7 @@ app.post('/', function (req, res) {
         text: 'Error: operation currently in progress'
       });
     } else {
-      console.log('valid client token', clientToken);
+      console.log('valid client token:', clientToken);
     }
 
   } else {

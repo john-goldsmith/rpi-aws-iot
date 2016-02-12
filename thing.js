@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 var awsIot = require('aws-iot-device-sdk'),
     AWS = require('aws-sdk'),
     exec = require('child_process').exec,
