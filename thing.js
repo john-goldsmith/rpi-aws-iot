@@ -26,7 +26,6 @@ device.on('connect', function () {
 });
 
 device.on('message', function (topic, payload) {
-  console.log('message', topic, payload.toString());
   execute(`raspistill -vf -hf -w 800 -h 600 -v -o ~/camera/camera.jpg`, function () {
     s3.putObject({
       Bucket: process.env.AWS_S3_BUCKET,
@@ -42,7 +41,7 @@ device.on('message', function (topic, payload) {
         device.publish('$aws/things/RPi/shadow/update', JSON.stringify({
           state: {
             reported: {
-              link: `https://s3-${process.env.AWS_IOT_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET}/key1`
+              link: `https://s3-${process.env.AWS_IOT_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET}/camera.jpg`
             }
           }
         }));
