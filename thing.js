@@ -55,7 +55,8 @@ device.on('message', function (topic, payload) {
         console.log('S3 Error:', err);
       } else {
         console.log('S3 Success:', data);
-        device.publish('$aws/things/RPi/shadow/update', JSON.stringify({
+        // device.publish('$aws/things/RPi/shadow/update', JSON.stringify({
+        device.publish('s3_success', JSON.stringify({
           state: {
             reported: {
               link: `https://s3-${process.env.AWS_IOT_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET}/camera.jpg`
