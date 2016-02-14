@@ -41,7 +41,7 @@ app.post('/', function (req, res) {
 
     thingShadow.on('timeout', function (thingName, clientToken) {
       console.log('timeout', thingName, clientToken);
-      res.status(200).json({
+      return res.status(200).json({
         response_type: 'in_channel',
         text: 'Error: timeout'
       });
@@ -54,7 +54,7 @@ app.post('/', function (req, res) {
       // if (status === 'accepted') {
       if (topic === 's3_success') {
         console.log('request accepted');
-        res.status(200).json({
+        return res.status(200).json({
           response_type: 'in_channel',
           attachments: [
             {
@@ -66,7 +66,7 @@ app.post('/', function (req, res) {
         });
       } else {
         console.log('request rejected');
-        res.status(200).json({
+        return res.status(200).json({
           response_type: 'in_channel',
           text: 'Error: request rejected'
         });
@@ -83,7 +83,7 @@ app.post('/', function (req, res) {
         console.log('valid client token:', clientToken);
       } else {
         console.log('invalid client token');
-        res.status(200).json({
+        return res.status(200).json({
           response_type: 'in_channel',
           text: 'Error: operation currently in progress'
         });
@@ -91,7 +91,7 @@ app.post('/', function (req, res) {
     }, 3000);
   } else {
     console.log('invalid Slack token');
-    res.status(200).json({
+    return res.status(200).json({
       response_type: 'in_channel',
       text: 'Error: token mismatch'
     });
