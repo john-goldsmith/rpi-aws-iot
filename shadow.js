@@ -15,10 +15,6 @@ thingShadow.on('connect', function () {
   console.log('connect');
 });
 
-thingShadow.on('message', function (topic, message) {
-  console.log('message', topic, message);
-});
-
 thingShadow.on('delta', function (thingName, state) {
   console.log('delta', thingName, state);
 });
@@ -41,6 +37,7 @@ app.post('/', function (req, res) {
     // thingShadow.subscribe('s3_success', {qos: 0}, function (err, granted) {
     //   console.log('s3_success', err, granted);
     // });
+    console.log('subscribed to s3_success');
 
     thingShadow.on('timeout', function (thingName, clientToken) {
       console.log('timeout', thingName, clientToken);
@@ -49,6 +46,7 @@ app.post('/', function (req, res) {
         text: 'Error: timeout'
       });
     });
+
     // thingShadow.on('status', function (thingName, status, clientToken, stateObject) {
     thingShadow.on('message', function (topic, message) {
       // console.log('status', thingName);
@@ -79,17 +77,16 @@ app.post('/', function (req, res) {
 
     setTimeout(function () {
       var clientToken = thingShadow.get(process.env.AWS_IOT_CLIENT_ID);
-      if (!clientToken) {
+      if (clientToken) {
+        console.log('valid client token:', clientToken);
+      } else {
         console.log('invalid client token');
         res.status(200).json({
           response_type: 'in_channel',
           text: 'Error: operation currently in progress'
         });
-      } else {
-        console.log('valid client token:', clientToken);
       }
     }, 3000);
-
   } else {
     console.log('invalid Slack token');
     res.status(200).json({

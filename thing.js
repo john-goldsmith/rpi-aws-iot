@@ -43,7 +43,7 @@ device.on('error', function (error) {
 });
 
 device.on('message', function (topic, payload) {
-  execute(`raspistill -vf -hf -w 800 -h 600 -v -o ~/camera/camera.jpg`, function () {
+  execute(`raspistill -w 400 -h 300 -q 50 -v -o ~/camera/camera.jpg`, function () {
     s3.putObject({
       Bucket: process.env.AWS_S3_BUCKET,
       Key: 'camera.jpg',
