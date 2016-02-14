@@ -71,6 +71,8 @@ app.post('/', function (req, res) {
           text: 'Error: request rejected'
         });
       }
+      thingShadow.unsubscribe('s3_success');
+      console.log('unsubscribed from s3_success');
       thingShadow.unregister(process.env.AWS_IOT_CLIENT_ID);
       console.log('unregistered interest');
     });
