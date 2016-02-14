@@ -7,11 +7,11 @@ var awsIot = require('aws-iot-device-sdk'),
     s3 = new AWS.S3();
 
 var device = awsIot.device({
-   keyPath: process.env.AWS_IOT_KEY_PATH,
+  keyPath: process.env.AWS_IOT_KEY_PATH,
   certPath: process.env.AWS_IOT_CERT_PATH,
-    caPath: process.env.AWS_IOT_CA_PATH,
-  clientId: process.env.AWS_IOT_CLIENT_ID,
-    region: process.env.AWS_IOT_REGION
+  caPath: process.env.AWS_IOT_CA_PATH,
+  // clientId: process.env.AWS_IOT_CLIENT_ID,
+  region: process.env.AWS_IOT_REGION
 });
 
 function execute (command, callback){
@@ -24,6 +24,22 @@ device.on('connect', function () {
   console.log('connect');
   device.subscribe('$aws/things/RPi/shadow/get/accepted');
   // device.subscribe('$aws/things/RPi/shadow/get/rejected');
+});
+
+device.on('reconnect', function () {
+  console.log('reconnect');
+});
+
+device.on('close', function () {
+  console.log('close');
+});
+
+device.on('offline', function () {
+  console.log('offline');
+});
+
+device.on('error', function (error) {
+  console.log('error', error);
 });
 
 device.on('message', function (topic, payload) {
