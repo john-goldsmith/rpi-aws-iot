@@ -34,14 +34,11 @@ app.post('/', function (req, res) {
     console.log('registered interest');
 
     thingShadow.subscribe('s3_success');
-    // thingShadow.subscribe('s3_success', {qos: 0}, function (err, granted) {
-    //   console.log('s3_success', err, granted);
-    // });
     console.log('subscribed to s3_success');
 
     thingShadow.on('timeout', function (thingName, clientToken) {
       console.log('timeout', thingName, clientToken);
-      return res.status(200).json({
+      res.status(200).json({
         response_type: 'in_channel',
         text: 'Error: timeout'
       });
@@ -50,11 +47,12 @@ app.post('/', function (req, res) {
     // thingShadow.on('status', function (thingName, status, clientToken, stateObject) {
     thingShadow.on('message', function (topic, message) {
       // console.log('status', thingName);
+      if (res.headersSent) return;
       console.log('message', topic, message);
       // if (status === 'accepted') {
       if (topic === 's3_success') {
         console.log('request accepted');
-        return res.status(200).json({
+        res.status(200).json({
           response_type: 'in_channel',
           attachments: [
             {
@@ -66,7 +64,7 @@ app.post('/', function (req, res) {
         });
       } else {
         console.log('request rejected');
-        return res.status(200).json({
+        res.status(200).json({
           response_type: 'in_channel',
           text: 'Error: request rejected'
         });
@@ -83,7 +81,7 @@ app.post('/', function (req, res) {
         console.log('valid client token:', clientToken);
       } else {
         console.log('invalid client token');
-        return res.status(200).json({
+        res.status(200).json({
           response_type: 'in_channel',
           text: 'Error: operation currently in progress'
         });
@@ -91,7 +89,7 @@ app.post('/', function (req, res) {
     }, 3000);
   } else {
     console.log('invalid Slack token');
-    return res.status(200).json({
+    res.status(200).json({
       response_type: 'in_channel',
       text: 'Error: token mismatch'
     });
